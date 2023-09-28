@@ -2,16 +2,13 @@ let Grid;
 let chessFigure;
 let w_pawn, w_king, w_bishoop, w_queen, w_rook, w_knight;
 let b_pawn, b_king, b_bishoop, b_queen, b_rook, b_knight;
-const isOverlap = (a, b) => {
-	return a.x >= b.x && a.x <= b.x && a.y >= b.y && a.y <= b.y;
-};
 function setup() {
 	new Canvas(900, 600);
 	// Cube size and offset
-	const cubeSize = 45;
+	const cubeSize = 50;
 	const colors = { black: "#c0733d", white: "#e1bc88" };
 	const names = { row: "abcdefgh", column: "12345678" };
-	const placementOffset = { x: 150, y: 250 };
+	const placementOffset = { x: 150, y: 450 };
 
 	// Chess figures group
 	chessFigure = new Group();
@@ -26,17 +23,16 @@ function setup() {
 
 	// Black and Whites groups
 	blackFigures = new chessFigure.Group();
-	blackFigures.y = placementOffset.y * 0.75;
 	whiteFigures = new chessFigure.Group();
 
 	// White Figures
 	w_king = new whiteFigures.Sprite();
 	w_king.img = "src/w_king.png";
 
-	let calcDistance = (blX = 1, blY = 1) => {
+	const calcDistance = (blockOffsetX = 1, blockOffsetY = 1) => {
 		// make placement by x and y in chess board
-		let x = placementOffset.x + cubeSize * 2.25 + blX * cubeSize;
-		let y = placementOffset.y + cubeSize * 5.75 - blY * cubeSize;
+		let x = placementOffset.x - cubeSize + blockOffsetX * cubeSize;
+		let y = placementOffset.y + cubeSize - blockOffsetY * cubeSize;
 		return { x, y };
 	};
 
@@ -145,14 +141,8 @@ function setup() {
 	b_bishoop[1].x = calcDistance(6, 8).x;
 	b_bishoop[1].y = calcDistance(6, 8).y;
 
-	noStroke();
 	// Grid blocks settings
 	Grid = new Group();
-	Grid.color = "white";
-	// Grid [column][row]
-	Grid.x = cubeSize + placementOffset.y;
-	// Column offset
-	Grid.y = (i) => i * cubeSize + placementOffset.x;
 	// Grid Layer
 	Grid.layer = 1;
 
@@ -160,11 +150,11 @@ function setup() {
 	Grid.w = cubeSize;
 	Grid.h = cubeSize;
 	Grid.collider = "n";
-	Grid.amount = 8;
 
 	let bl;
 	// Grid row
 	for (let i = 0; i < 8; i++) {
+		noStroke();
 		Grid[i] = new Grid.Group();
 
 		let c = i * cubeSize;
@@ -175,10 +165,11 @@ function setup() {
 		} else {
 			Grid[i].color = colors.black;
 		}
-		// Grid row offset
-		Grid[i].x = (i) => i * cubeSize + cubeSize + placementOffset.y;
+		// Grid [row][column]
 		// Y offset
-		Grid[i].y = c + placementOffset.x;
+		Grid[i].y = (i) => -(i * cubeSize) + placementOffset.y;
+		// Grid X offset
+		Grid[i].x = c + placementOffset.x;
 		Grid[i].color = (ia) => {
 			// Chess coloring
 			if (ia % 2 === 0 && bl) {
